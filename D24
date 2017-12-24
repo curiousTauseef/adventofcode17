@@ -1,0 +1,124 @@
+# -*- coding: utf-8 -*-
+"""
+--- Day 24: Electromagnetic Moat ---
+The CPU itself is a large, black building surrounded by a bottomless pit.
+Enormous metal tubes extend outward from the side of the building at regular
+intervals and descend down into the void. There's no way to cross, but you
+need to get inside.
+
+No way, of course, other than building a bridge out of the magnetic components
+strewn about nearby.
+
+Each component has two ports, one on each end. The ports come in all different
+types, and only matching types can be connected. You take an inventory of the
+components by their port types (your puzzle input). Each port is identified
+by the number of pins it uses; more pins mean a stronger connection for your
+bridge. A 3/7 component, for example, has a type-3 port on one side, and a
+type-7 port on the other.
+
+Your side of the pit is metallic; a perfect surface to connect a magnetic,
+zero-pin port. Because of this, the first port you use must be of type 0.
+It doesn't matter what type of port you end with; your goal is just to make
+the bridge as strong as possible.
+
+The strength of a bridge is the sum of the port types in each component.
+For example, if your bridge is made of components 0/3, 3/7, and 7/4, your
+bridge has a strength of 0+3 + 3+7 + 7+4 = 24.
+
+For example, suppose you had the following components:
+
+0/2
+2/2
+2/3
+3/4
+3/5
+0/1
+10/1
+9/10
+With them, you could make the following valid bridges:
+
+0/1
+0/1--10/1
+0/1--10/1--9/10
+0/2
+0/2--2/3
+0/2--2/3--3/4
+0/2--2/3--3/5
+0/2--2/2
+0/2--2/2--2/3
+0/2--2/2--2/3--3/4
+0/2--2/2--2/3--3/5
+(Note how, as shown by 10/1, order of ports within a component doesn't matter.
+However, you may only use each port on a component once.)
+
+Of these bridges, the strongest one is 0/1--10/1--9/10;
+it has a strength of 0+1 + 1+10 + 10+9 = 31.
+
+What is the strength of the strongest bridge you can make with the components
+you have available?
+
+
+"""
+input_txt = '''0/2
+2/2
+2/3
+3/4
+3/5
+0/1
+1/10
+9/10'''
+
+# Parse input
+input_lines = input_txt.split('\n')
+comp = []
+for line in input_lines:
+    ports = line.split('/')
+    print(ports)
+    comp.append(list(map(int,ports)))
+
+# Helper functions
+def flip(c):
+    return [c[1],c[0]]
+
+def match(c1, c2):
+    return c1[-1] == c2[0]
+
+def validstart(c):
+    return (c[0] == 0) or (c[1] == 0)
+
+def strength(b):
+    return b[0] + b[-1] + 2*sum(b[1:-1])
+
+global high
+high = 0
+
+
+# Recursion function
+def pair(b, comprem, high):
+    for idx in range(len(comprem)-1, -1,-1):
+        c = comprem[idx]
+        if match(b,c) or match(b,flip(c)):
+            tmp = comprem.pop(idx)
+            if match(b,c):
+                b.append(c[1]) #First port matched, add second one as the "end"
+            else:
+                b.append(c[0])
+            # Recursion
+            pair(b,comprem, high)
+            b.pop() # return element
+            comprem.append(tmp)
+        # End trying all matches
+        if strength(b) > high
+            high = strength(b)
+            
+
+# Look for valid start
+for idx in range(len(comp)-1, -1,-1): #Start from high to low to not mess pop
+    s = comp[idx]
+    if validstart(s):
+        tmp = comp.pop(idx)
+        if not s[0] == 0:
+            s = flip(s)
+        # Try next
+        pair(s, comp, high)
+        comp.append(tmp)
